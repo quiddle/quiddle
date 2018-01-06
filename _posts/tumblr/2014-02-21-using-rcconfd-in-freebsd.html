@@ -1,0 +1,29 @@
+---
+layout: post
+title: Using rc.conf.d in FreeBSD
+date: '2014-02-21T15:30:08-05:00'
+tags:
+- freebsd
+- reference
+tumblr_url: http://quiddle.net/post/77406007305/using-rcconfd-in-freebsd
+---
+<p>FreeBSD, for better or worse, initializes through a series of scripts in the <strong>/etc/rc.d</strong> folder. The various flags and settings are set with a single file: <strong>/etc/rc.conf</strong>. However, there is another option!</p>
+<p>You can also create a folder called <strong><a href="http://www.freebsd.org/cgi/man.cgi?query=rc.conf&amp;sektion=5" target="_blank">/etc/rc.conf.d/</a> </strong>(third paragraph) and put discrete files named after their respective <strong>/etc/rc.d</strong> scripts. For example, to enable <em>sshd</em>, create <strong>/etc/rc.conf.d/sshd</strong> which contains:</p>
+<blockquote>
+<p>sshd_enable=&ldquo;YES&rdquo;</p>
+</blockquote>
+<p>The name of the file matches the startup script, <strong>/etc/rc.d/sshd</strong>, so it&rsquo;s nice and obvious.</p>
+<p>When I learned about this option, I began using that folder for all of my startup configuration files. I was left with a small <strong>/etc/rc.conf</strong> file that contained the hostname of the machine, default router, IP address allocation and (if necessary) the flag to enable routing between network interfaces. I knew that these variables could also be placed into discrete files, but it was not readily apparent to me what those files should be named. This setup makes automating system configurations with a system like Puppet or Chef much easier.</p>
+<p>After some trial and error this afternoon, I&rsquo;ve finally figured out the correct files for those last settings, which eliminates the need for the original rc.conf file.</p>
+<blockquote>
+<p>## /etc/rc.conf.d/hostname</p>
+<p>hostname=&ldquo;YOUR HOSTNAME&rdquo;</p>
+
+<p>## /etc/rc.conf.d/network</p>
+<p>ifconfig_&lt;interface&gt;_aliases=&ldquo;inet 0.0.0.0/24&rdquo;</p>
+
+<p>## /etc/rc.conf.d/routing</p>
+<p>gateway_enable=&ldquo;YES&rdquo;</p>
+<p>defaultrouter=&ldquo;IP of default gateway/router&rdquo;</p>
+</blockquote>
+<p>It took awhile to find these. Google and grepping through the startup scripts only helped to narrow things down a little, so I&rsquo;ve put this up to help anyone else that might be searching for these answers.</p>

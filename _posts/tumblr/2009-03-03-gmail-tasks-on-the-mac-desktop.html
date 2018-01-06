@@ -1,0 +1,21 @@
+---
+layout: post
+title: Gmail Tasks On The (Mac) Desktop
+date: '2009-03-03T13:55:00-05:00'
+tags: []
+tumblr_url: http://quiddle.net/post/83210464/gmail-tasks-on-the-mac-desktop
+---
+<p><b>UPDATE:</b> You can skip all of the user agent string junk and just use <a href="http://mail.google.com/tasks/ig" target="_blank">http://mail.google.com/tasks/ig</a> or <a href="http://mail.google.com/tasks/a/DOMAIN/ig" target="_blank">http://mail.google.com/tasks/a/DOMAIN/ig</a> for Google Apps as the URL for Fluid. Makes life simpler!</p>
+<p>Google recently added <a href="http://mail.google.com/support/bin/answer.py?hl=en&amp;ctx=mail&amp;answer=106237" target="_blank">Tasks</a> via a Gmail Labs add-on. I find this simple task list to be quite useful. However, it&rsquo;s tied to Gmail in that Gmail <i>has</i> to be open in a browser window for it to function. The &ldquo;pop-out&rdquo; feature is nice, but the Tasks lists automatically closes when the main Gmail window is closed.</p>
+<p>Shortly after the initial launch, Google announced a version of Tasks optimized for mobile clients. If I had an iPhone, that&rsquo;d be great, but I don&rsquo;t. However, I was able to exploit this to make a Gmail Task application!</p>
+<p>I verified this would work by <a href="http://developer.apple.com/safari/library/documentation/AppleApplications/Conceptual/Safari_Developer_Guide/2SafariDeveloperTools/chapter_2_section_5.html" target="_blank">changing Safari&rsquo;s User Agent string</a> to Mobile Safari and visiting <a href="http://mail.google.com/tasks" target="_blank">http://mail.google.com/tasks</a>. It didn&rsquo;t work immediately, because I use <a href="http://www.google.com/apps/intl/en/business/index.html" target="_blank">Google Apps</a>. A quick check showed that I need to add /a/quiddle.net to the end of that address. It worked!</p>
+<p>To make a desktop app from a website, I used <a href="http://fluidapp.com/" target="_blank">Fluid</a>. (If you&rsquo;re not on a Mac, you might be able to use <a href="http://labs.mozilla.com/projects/prism/" target="_blank">Prism</a>, but I have not verified this.) I ran Fluid, entered my URL, named it Gmail Tasks and created my app.</p>
+<p>When I first ran my new Gmail Tasks app, it displayed the Tasks help page, because the User Agent string was not identified as a mobile browser. No problem- apps made by Fluid allow you to change the User Agent. The menu option is under (in this case) Gmail Tasks-&gt;User Agent. The Mobile Safari version listed is out of date (Tasks gave me a warning) so I used Other&hellip; to change it to Mobile Safari 2.2.1:</p>
+<pre>Mozilla/5.0 (iPhone; U; CPU iPhone OS 2_2_1 like Mac OS X; en-us) 
+AppleWebKit/525.18.1 (KHTML, like Gecko) 
+Version/3.1.1 Mobile/5H11 Safari/525.20</pre>
+<p>Now it comes right up!</p>
+<p><a title="Gmail Tasks as Application by thadman, on Flickr" href="http://www.flickr.com/photos/quiddle/3326394812/" target="_blank"><img alt="Gmail Tasks as Application" height="500" width="426" src="http://farm4.static.flickr.com/3590/3326394812_d3de35660b.jpg"/></a></p>
+<p>For bonus points, I dug into the HTML source and found the <a href="http://developer.apple.com/safari/library/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/chapter_8_section_2.html" target="_blank">iPhone webpage icon</a> and set it as the application icon.<br/><br/><a href="http://mail.google.com/tasks/res/apple-touch-icon.png" target="_blank"><img alt="Gmail Tasks Apple Touch Icon" src="http://mail.google.com/tasks/res/apple-touch-icon.png"/></a></p>
+<p>Now I have a simple desktop task list that&rsquo;s automatically synced up to Gmail and available anywhere!</p>
+<p>Update: <a title="View comment threads" href="http://disqus.com/forums/quiddle/gmail_tasks_on_the_desktop/" target="_blank">Original DISQUS comments</a></p>

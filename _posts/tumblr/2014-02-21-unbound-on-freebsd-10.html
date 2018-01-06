@@ -1,0 +1,24 @@
+---
+layout: post
+title: Unbound on FreeBSD 10
+date: '2014-02-21T11:25:00-05:00'
+tags:
+- freebsd reference
+tumblr_url: http://quiddle.net/post/77387423110/unbound-on-freebsd-10
+---
+<p>FreeBSD 10 ships with <em><a href="http://unbound.net" target="_blank">unbound</a></em> as a local DNS resolver instead of BIND. There are <a href="http://blog.des.no/2013/09/dns-in-freebsd-10/" target="_blank">many reasons for this</a> and overall, it seems like a good move in the name of simplicity. BIND is a critical piece of the Internet and has frequent security updates, which is painful to maintain when all you need is DNS resolution, let alone the release engineering nightmare for the FreeBSD foundation trying to maintain a release schedule. You can still add BIND from the ports and keep it up to date on your own.</p>
+<p>All that said, it&rsquo;s quite easy to enable <em>unbound</em> in <strong>/etc/rc.conf</strong> or (as I prefer) <strong>/etc/rc.conf.d/local_unbound</strong>:</p>
+<blockquote>
+<p>local_unbound_enable=&ldquo;YES&rdquo;</p>
+</blockquote>
+<p>That&rsquo;s it.  Either reboot or start up <em>unbound</em> with:<em><br/></em></p>
+<blockquote>
+<p># /etc/rc.d/local_unbound start</p>
+</blockquote>
+<p><em>unbound</em> will automatically set up a configuration in <strong>/var/unbound/unbound.conf</strong> that allows for resolution on the localhost. If you need to answer queries on a local network, you can add a few lines to this file. For me, it looked like this:</p>
+<blockquote>
+<p>interface: 127.0.0.1</p>
+<p>interface: 10.0.0.254</p>
+<p>access-control: 10.0.0.0/24 allow</p>
+</blockquote>
+<p>Obviously, use your own local IP and correct subnet. If you don&rsquo;t explicitly add <strong>127.0.0.1</strong>, <em>unbound</em> will no longer listen to the localhost. However, you don&rsquo;t need add an <strong>access-control</strong> entry for localhost, as that&rsquo;s allowed by default.</p>

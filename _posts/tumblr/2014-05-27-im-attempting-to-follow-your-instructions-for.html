@@ -1,0 +1,18 @@
+---
+layout: post
+title: I'm attempting to follow your instructions for migrating RDS into VPC.  How
+  did you get around the need to GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%' ?  I
+  get an access denied error.
+date: '2014-05-27T12:16:41-04:00'
+tags: []
+tumblr_url: http://quiddle.net/post/87009700103/im-attempting-to-follow-your-instructions-for
+---
+<p>I was just able to create a user and add the replication privilege, doing the following:</p>
+<blockquote>
+<p>mysqluser@FOO.us-east-1.rds.amazonaws.com</p>
+<p>[mysql]&gt; create user &lsquo;testrepl&rsquo;@&rsquo;%&rsquo; identified by 'SAFEPASSWORD&rsquo;;</p>
+<p>Query OK, 0 rows affected (0.06 sec) <span>mysqluser@FOO.cqdc1rbnps8s.us-east-1.rds.amazonaws.com</span></p>
+<p>[mysql]&gt; grant replication slave on *.* to 'testrepl&rsquo;@&rsquo;%&rsquo;;</p>
+<p>Query OK, 0 rows affected (0.03 sec)</p>
+</blockquote>
+<p>I know that accomplishing this migration required that I was running MySQL 5.6. It might be that you&rsquo;re running an older version which prevents this type of setup.</p>

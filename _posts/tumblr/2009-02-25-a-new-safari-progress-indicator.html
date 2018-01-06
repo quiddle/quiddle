@@ -1,0 +1,24 @@
+---
+layout: post
+title: A New Safari Progress Indicator
+date: '2009-02-25T16:41:00-05:00'
+tags: []
+tumblr_url: http://quiddle.net/post/81499709/a-new-safari-progress-indicator
+---
+<p>I&rsquo;ve been trying out the <a href="http://www.apple.com/safari/" target="_blank">Safari 4 beta release</a> and enjoying some of the changes. Some people are not (then why try new software?) and immediately came up with ways to &lt; href=&ldquo;http://swedishcampground.com/safari-4-hidden-preferences&rdquo;&gt;revert behavior to mimic Safari 3.</p>
+<p>Only one thing is bugging me. Until now, Safari indicated page loading progress with a blue bar behind the URL in the address bar. Safari 4 displays a little spinning widget to show that it&rsquo;s working, but no indication of <i>progress</i>.</p>
+<p>I succumbed and reverted to the original blue bar indicator by running these commands:</p>
+<pre>$ defaults write com.apple.Safari \
+          DebugSafari4IncludeToolbarRedesign -bool NO
+$ defaults write com.apple.Safari \
+          DebugSafari4LoadProgressStyle -bool NO</pre>
+<p>Perfect! At some point, I noticed I was without a stop/refresh button and added it back in.</p>
+<p>Later, I read about the new refresh button integrated into the address bar <i>What?</i> I thought, <i>I don&rsquo;t have that!</i> I reverted my reversions (YES instead of NO) and sure enough, there&rsquo;s a refresh button in the address bar!</p>
+<p><i>Neat,</i> I thought, <i>but now I&rsquo;ve got the worthless spinner again.</i> I played around with those two settings and was unable to find a solution that involved a progress indicator AND an integrated progress indicator, but I did find a new progress indicator! Set the preferences up as such:</p>
+<pre>$ defaults write com.apple.Safari \
+          DebugSafari4IncludeToolbarRedesign -bool NO
+$ defaults write com.apple.Safari \
+          DebugSafari4LoadProgressStyle -bool YES</pre>
+<p>and you&rsquo;ll get a little pie chart indicator that pops up over the favicon!</p>
+<p><a title="New Progress indicator in Safari 4 by thadman, on Flickr" href="http://www.flickr.com/photos/quiddle/3309316637/" target="_blank"><img alt="New Progress indicator in Safari 4" height="84" width="170" src="http://farm4.static.flickr.com/3659/3309316637_047aca0b09_o.png"/></a></p>
+<p>UPDATE: <a title="View Original Comment Thread" href="http://disqus.com/forums/quiddle/a_new_safari_progress_indicator/" target="_blank">Original DISQUS Comments</a></p>

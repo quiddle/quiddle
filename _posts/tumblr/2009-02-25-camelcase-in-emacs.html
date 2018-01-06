@@ -1,0 +1,56 @@
+---
+layout: post
+title: CamelCase in Emacs
+date: '2009-02-25T13:48:00-05:00'
+tags: []
+tumblr_url: http://quiddle.net/post/81458823/camelcase-in-emacs
+---
+<p>Programming necessitates variables. There&rsquo;s no getting around it. Some <i>thing</i> needs to remember the number of widgets or the name of a particular widget. Simple programs usually start with simple variable names:</p>
+<pre>a=3;
+b="Deluxe Widget";</pre>
+<p><b>a</b> and <b>b</b> are variables that hold the values 3 and &ldquo;Deluxe Widget&rdquo; respectively. As a program gets more complicated and the number of variables increases, the variable names get more complex. Many times the name should be more than one word, like &ldquo;widget count,&rdquo; but for various reasons, this is not allowed. So we programmers get clever with underscores:</p>
+<pre>widget_count=3;
+widget_name="Deluxe Widget";</pre>
+<p>Or perhaps use camelCase (I guess they look like camels with all of the humps?):</p>
+<pre>widgetCount=3;
+widgetName="Deluxe Widget";</pre>
+<p>Arguments over variable naming conventions are common. It&rsquo;s petty, but so are programmers. Either way, <i>something</i> has to be done.</p>
+<p>I like camelCase.</p>
+<p>I rarely use it.</p>
+<p>Why not? Because I use <a href="http://www.gnu.org/software/emacs/" target="_blank">Emacs</a> to edit my files. Emacs has keystrokes that allow you to delete a single &ldquo;word&rdquo; all at once. Hold down the alt key, hit delete and Emacs deletes an entire word. It also allows you to move your cursor forwards and backwards word by word. The problem is how Emacs defines what a word is. If I want to delete or change part of a variable name (which happens all the time) it works fine with underscore separated variable names, but not with camelCase. When I use camelCase naming, I&rsquo;m resigned to constantly retyping entire variable names.</p>
+<p>Until now! After the topic came up on twitter today, I decided that there had to be a solution. Emacs is built to be extended and it has been. There are modules and add-ons to do everything. Literally. You can even <a href="http://www.gnu.org/software/emacs/tour/images/tetris.png" target="_blank">play Tetris in Emacs</a>.</p>
+<p>So I looked around and immediately <a href="http://www.eecs.ucf.edu/~leavens/emacs/camelCase/camelCase-mode.el" target="_blank">found this</a>. A minor mode for Emacs that provides key bindings for camelCase! I dropped it into my personal Emacs directory and set it up to load when ever any file was opened. This is done in my .emacs file (it&rsquo;s LISP and a little ugly):</p>
+<pre>;;Include my personal Emacs Directory when looking for files to load
+(setq load-path (cons "~/Dropbox/.emacs.d" load-path))
+
+;;Load the camelCase file
+(load "camelCase-mode")
+
+;;Start camelCase-mode whenever a file is 'found' (opened)
+(add-hook 'find-file-hook '(lambda () (camelCase-mode 1)))</pre>
+<p>That should have done it. However, when I started up Emacs, I got the following error:</p>
+<pre>Error in init file: Symbol's function definition is void: first</pre>
+<p>I dug into the camelCase file and found the problem buried in the function that maps the new key bindings:</p>
+<pre>(define-key map (first binding) (second binding)))</pre>
+<p><b>binding</b> is a list that contains two things: a keystroke sequence and what should happen on that keystroke. What&rsquo;s wrong here is that to get the first and second items, the functions <b>first</b> and <b>second</b> are called. These functions don&rsquo;t exist within Emacs! Initially, I fixed this directly within the camelCase file. Then I decided that I&rsquo;d rather leave that file untouched. In order to make it work, I needed to define <b>first</b> and <b>second</b> as functions that do what camelCase expects. So I added the function definitions to my .emacs file. The final result looks like this:</p>
+<pre>;;Include my personal Emacs Directory when looking for files to load
+(setq load-path (cons "~/Dropbox/.emacs.d" load-path))
+
+;;Define 'first' to return the first element of a list.
+(defun first (argList)
+  "Return the first element of a list"
+  (nth 0 argList))
+
+;;Define 'second' to return the second element of a list
+(defun second (argList)
+  "Return the second element of a list"
+  (nth 1 argList))
+
+
+;;Load the camelCase file
+(load "camelCase-mode")
+
+;;Start camelCase-mode whenever a file is 'found' (opened)
+(add-hook 'find-file-hook '(lambda () (camelCase-mode 1)))</pre>
+<p>And that works just fine! I expect to start using camelCase variable names far more often now.</p>
+<p>UPDATE: <a title="View original comment threads" href="http://disqus.com/forums/quiddle/camelcase_in_emacs/" target="_blank">Original DISQUS Comments</a></p>

@@ -1,0 +1,36 @@
+---
+layout: post
+title: Migrating RDS from EC2 to VPC
+date: '2014-03-03T12:36:00-05:00'
+tags:
+- amazon web services
+- aws
+- rds
+- mysql
+tumblr_url: http://quiddle.net/post/78453641455/migrating-rds-from-ec2-to-vpc
+---
+<p><em>Forward: One of the frustrating things about working with a cloud provider like Amazon Web Services, is that each service has to have a <strong>name</strong>. Each name is, of course, too long to use in everyday conversation, so they&rsquo;re all initialized and acronymed until someone new to the platform has <strong>no idea</strong> what any of the letters mean. I apologize in advance and I promise I&rsquo;ll try to explain all of the TLAs (Three Letter Acronyms) as clearly as possible.</em></p>
+<p>##The Problem</p>
+<p>In early 2013, I started using Amazon RDS (Relational Database Service) to manage old MySQL data for work. (RDS lets you pick a database engine (Oracle, MySQL, Postgres, SQLServer), gives you great flexibility with storage and scalability and manages backups and failovers transparently.) After a few months, I migrated the rest of our data and things have been great.</p>
+<p>Recently (sometime in 2013), AWS made their Virtual Private Cloud platform the default for all new accounts, but this was after our RDS instance was created. At the Re:invent conference, AWS made it very clear that their VPC platform was the way forward and that anything new should be using it.</p>
+<p>So here I am, <strike>brain the size of a planet</strike> ready to start migrating other services to AWS, but our primary database is not in a Virtual Private Cloud and I shudder at the idea of having to redo everything in a few years when AWS decides that support for standalone instances goes away.<!-- more --></p>
+<p>##The Solution</p>
+<p>The <em>easiest</em> solution would simply be to launch a read-replica that resides in a VPC and then promote it to Master, but that is not (as of right now) allowed.</p>
+<p>I combined the techniques for <a href="http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MySQL.Procedural.Exporting.NonRDSRepl.html" target="_blank">replicating to an external source</a> and <a href="http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MySQL.Procedural.Importing.NonRDSRepl.html" target="_blank">importing data from an external source</a> to make a painless, zero-downtime migration into a VPC. If you have enough data in your database that mysqldump has the potential to run for hours and hours, this might be useful to you.</p>
+<p>First, <a href="http://dev.mysql.com/doc/refman/5.6/en/replication-howto-repuser.html" target="_blank">add a user for replication</a> and remember the username and password. Next, create a read replica of the original database. When it&rsquo;s up and running, connect to it on the command line and manually stop the replication. (Since you&rsquo;re not technically a root user, you need to utilize the <a href="http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.MySQL.SQLRef.html" target="_blank">stored procedures that RDS provides for you</a>.)</p>
+<blockquote>
+<p>&gt; CALL mysql.rds_stop_replication();</p>
+</blockquote>
+<p>Then, run &ldquo;SHOW SLAVE STATUS\G&rdquo; and copy the values for <em>Master_Log_File</em> and <em>Read_Master_Log_Pos</em>. Leave the replication halted and return to the RDS Console in your browser. Select the read replica and take a snapshot of it.</p>
+<p><em>At this point, I&rsquo;m assuming your VPC is already configured. If you haven&rsquo;t done it yet, you can refer to <a href="http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.html" target="_blank">this article on running RDS on VPC</a>. Make sure your Database Subnet Groups have been created and that you have an Internet Gateway associated with those subnets and a route table that allows traffic. You&rsquo;ll also need to make rules in your security groups that allow traffic between the VPC and EC2 RDS instances. This is discussed in the <a href="http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MySQL.Procedural.Exporting.NonRDSRepl.html" target="_blank">article I linked to above</a>.</em></p>
+<p>Once the snapshot is complete, find it under the snapshots tab, select it and hit the big <em>Restore Snapshot</em> button. In the options, make sure to specify your VPC and corresponding Subnet Groups.</p>
+<p>When this new instance is running, connect to it on the command line and run the <a href="http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/mysql_rds_set_external_master.html" target="_blank"><em>set_external_master</em></a> stored procedure, using the replication user and password you set up first, along with the master log file information you copied. Now, run</p>
+<blockquote>
+<p>&gt; CALL mysql.rds_start_replication();</p>
+</blockquote>
+<p>and you&rsquo;re good to go! Use &ldquo;SHOW SLAVE STATUS\G&rdquo; and watch the value of <em>seconds_behind_master</em> to see when you&rsquo;re all caught up.</p>
+<p>You&rsquo;ll need to change your application code to point to the new instance. Please test this first and choose the method of migration that&rsquo;s appropriate for you. When you&rsquo;ve successfully migrated to your database in your VPC, use</p>
+<blockquote>
+<p>&gt; CALL mysql.rds_reset_external_master();</p>
+</blockquote>
+<p>and then shut down your original instance along with the temporary read replica you created for making a snapshot. You can probably remove some rules from your Security groups as well.</p>
